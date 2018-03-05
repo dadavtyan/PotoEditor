@@ -2,12 +2,16 @@ package com.davtyan.photoeditor.utils;
 
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -87,6 +91,20 @@ public class BitmapUtil {
 
     }
 
+    public static Bitmap createTextBitmap(String text, int color) {
+        Bitmap bitmap = Bitmap.createBitmap(text.length() * 80, 200, Bitmap.Config.ARGB_8888);
+        Paint paint = new Paint();
+        if (color != 0) {
+            paint.setColor(color);
+        } else {
+            paint.setColor(Color.WHITE);
+        }
+        paint.setTextSize(150);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawText(text, 0, 150, paint);
+        return bitmap;
+    }
+
 
     public static Bitmap fffff(Bitmap bitmap) {
         ArrayList<Bitmap> bitmaps = new ArrayList<>();
@@ -145,11 +163,64 @@ public class BitmapUtil {
                     break;
             }
 
-          // lift = (i == 0 ? 0 : lift + bitmap.get(i).getWidth());
+            // lift = (i == 0 ? 0 : lift + bitmap.get(i).getWidth());
             //attributes 1:bitmap,2:width that starts drawing,3:height that starts drawing
             canvas.drawBitmap(bitmap.get(i), lift, top, null);
         }
         return temp;
     }
 
+
+    public static Bitmap getCroppedBitmap(Bitmap src, Path path) {
+        Bitmap output = Bitmap.createBitmap(src.getWidth(),
+                src.getHeight(), Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(output);
+
+        Paint paint = new Paint();
+
+        paint.setColor(Color.WHITE);
+        canvas.drawPath(path, paint);
+        // Keeps the source pixels that cover the destination pixels,
+        // discards the remaining source and destination pixels.
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.LIGHTEN));
+        canvas.drawBitmap(src, 0, 0, paint);
+        return output;
+    }
+
+    public static Bitmap getSampledBitmap(String filePath, float reqWidth, float reqHeight) {
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(filePath, options);
+
+        int inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+        options.inSampleSize = inSampleSize;
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(filePath, options);
+    }
+
+    public static int calculateInSampleSize(BitmapFactory.Options options, float reqWidth, float reqHeight) {
+        // Raw height and width of image
+        final float height = options.outHeight;
+        final float width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final float halfHeight = (float) (height / 1.5);
+            final float halfWidth = (float) (width / 1.5);
+
+//             Calculate the largest inSampleSize value that is a power of 2 and keeps both
+//             height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+
+            }
+        }
+        Log.d("int_log", String.valueOf(inSampleSize));
+        return inSampleSize;
+    }
 }

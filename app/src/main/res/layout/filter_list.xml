@@ -1,26 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp"
+    android:layout_marginLeft="4dp"
+    android:id="@+id/album_card"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    app:cardCornerRadius="0dp">
 
+<RelativeLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center">
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <ImageView
         android:id="@+id/my_filter"
-        android:layout_marginTop="6dp"
-        android:layout_marginLeft="6dp"
-        android:layout_width="80dp"
-        android:layout_height="60dp" />
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:scaleType="centerCrop"/>
 
-    <TextView
-        android:id="@+id/filter_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp"
-        android:text="ttt"
-        android:textColor="#fff"
-        />
+   <LinearLayout
+       android:layout_below="@id/my_filter"
+       android:layout_width="60dp"
+       android:layout_height="16dp"
+       android:background="#000">
+       <TextView
+           android:id="@+id/filter_name"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:gravity="center"
+           android:text="ttt"
+           android:textColor="#fff"
+           />
+   </LinearLayout>
+</RelativeLayout>
 
-</LinearLayout>
+</android.support.v7.widget.CardView>

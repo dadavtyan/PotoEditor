@@ -41,5 +41,6 @@ public class BeautyFragment extends BaseEditFragment {
     public void backToMain() {
         //activity.mode = EditorActivity.MODE_NONE;
         activity.bottomGallery.setCurrentItem(0);
+        activity.flipper.showPrevious();
     }
 }

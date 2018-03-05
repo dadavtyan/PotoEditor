@@ -43,4 +43,6 @@ public class FilterAdapter extends RecyclerView.Adapter<FilterHolder> {
     public int getItemCount() {
         return filterModels.size();
     }
+
+
 }

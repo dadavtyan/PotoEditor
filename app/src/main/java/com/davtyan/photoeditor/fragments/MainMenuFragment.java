@@ -100,12 +100,14 @@ public class MainMenuFragment extends BaseEditFragment implements View.OnClickLi
         activity.bottomGallery.setCurrentItem(INDEX_FILTER);
        // activity.filterListFragment.onShow();
         activity.mode = INDEX_FILTER;
+        activity.flipper.showNext();
     }
 
     private void onShowStickerFragment() {
         activity.bottomGallery.setCurrentItem(INDEX_STICKER);
         //activity.stickerFragment.onShow();
         activity.mode = INDEX_STICKER;
+        activity.flipper.showNext();
     }
 
     private void onShowAddTextFragment() {
@@ -114,30 +116,35 @@ public class MainMenuFragment extends BaseEditFragment implements View.OnClickLi
         activity.mode = INDEX_ADDTEXT;
 
         AddTextFragment.show(activity);
+        activity.flipper.showNext();
 
     }
     private void onShowPaintFragment() {
         activity.bottomGallery.setCurrentItem(INDEX_PAINT);
         //activity.paintFragment.onShow();
         activity.mode = INDEX_PAINT;
+        activity.flipper.showNext();
     }
 
     private void onShowRotateFragment() {
         activity.bottomGallery.setCurrentItem(INDEX_ROTATE);
         //activity.rotateFragment.onShow();
         activity.mode = INDEX_ROTATE;
+        activity.flipper.showNext();
     }
 
     private void onShowCropFragment() {
         activity.bottomGallery.setCurrentItem(INDEX_CROP);
         //activity.cropFragment.onShow();
         activity.mode = INDEX_CROP;
+        activity.flipper.showNext();
     }
 
     private void onShowBeautyFragment() {
         activity.bottomGallery.setCurrentItem(INDEX_BEAUTY);
         activity.mode = INDEX_BEAUTY;
         //activity.beautyFragment.onShow();
+        activity.flipper.showNext();
     }
 
 }

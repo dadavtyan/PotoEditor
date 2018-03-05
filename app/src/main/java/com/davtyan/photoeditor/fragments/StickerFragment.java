@@ -80,6 +80,7 @@ public class StickerFragment extends BaseEditFragment {
     public void backToMain() {
         activity.mode = 0;
         activity.bottomGallery.setCurrentItem(0);
+        activity.flipper.showPrevious();
 //        mStickerView.setVisibility(View.GONE);
 //        activity.bannerFlipper.showPrevious();
     }

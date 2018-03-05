@@ -2,5 +2,5 @@ package com.davtyan.photoeditor;
 
 
 public enum Select {
-    RIGHT,LEFT,CENTER,DEFAULT;
+    TOP_RIGHT,TOP_LEFT,CENTER,BOTTOM_RIGHT,BOTTOM_LEFT ,DEFAULT;
 }

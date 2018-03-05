@@ -1,13 +1,107 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<HorizontalScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.davtyan.photoeditor.fragments.CropFragment">
+    android:background="#000">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/crop_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="6dp"
+            android:textColor="#fff"
+            android:textSize="20dp"
+            android:text="None"/>
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/crop_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="6dp"
+        android:textColor="#fff"
+        android:textSize="20dp"
+        android:text="1:1"/>
+    <TextView
+        android:id="@+id/crop_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="6dp"
+        android:textColor="#fff"
+        android:textSize="20dp"
+        android:text="1:2"/>
+
+    <TextView
+        android:id="@+id/crop_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textColor="#fff"
+        android:layout_margin="6dp"
+        android:textSize="20dp"
+        android:text="1:3"/>
+
+
+        <TextView
+            android:id="@+id/crop_5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="6dp"
+            android:textColor="#fff"
+            android:textSize="20dp"
+            android:text="2:3"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="6dp"
+            android:textColor="#fff"
+            android:textSize="20dp"
+            android:text="3:4"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="#fff"
+            android:layout_margin="6dp"
+            android:textSize="20dp"
+            android:text="2:1"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="6dp"
+            android:textColor="#fff"
+            android:textSize="20dp"
+            android:text="3:1"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="6dp"
+            android:textColor="#fff"
+            android:textSize="20dp"
+            android:text="3:2"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="#fff"
+            android:layout_margin="6dp"
+            android:textSize="20dp"
+            android:text="4:3"/>
+
+    </LinearLayout>
+
+</HorizontalScrollView>
+
+

@@ -72,6 +72,7 @@ public class EditTextFragment extends BaseEditFragment implements View.OnClickLi
     public void backToMain() {
         activity.mode = 0;
         activity.bottomGallery.setCurrentItem(0);
+        activity.flipper.showPrevious();
     }
 
 

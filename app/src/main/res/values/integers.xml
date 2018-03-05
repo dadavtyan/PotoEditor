@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer-array name="mul_filters">
+        <item>0</item>
+        <item>0xFF7F7F7F</item>
+        <item>0x29b6f6</item>
+        <item>0xFFFFFFFF</item>
+        <item>0x00FFFF</item>
+        <item>0x00BFFF</item>
+        <item>0xFF7F7F7F</item>
+        <item>0x6a1b9a</item>
+        <item>0x7FFFD4</item>
+        <item>0x9fa8da</item>
+        <item>0xFF1493</item>
+        <item>0x00FF00</item>
+        <item>0xFF7F7F7F</item>
+
+    </integer-array>
+
+
+    <integer-array name="add_filters">
+        <item>0</item>
+        <item>0x00000000</item>
+        <item>0x00000000</item>
+        <item>0x00222222</item>
+        <item>0x00000000</item>
+        <item>0x00000000</item>
+        <item>0x00222222</item>
+        <item>0x00000000</item>
+        <item>0x00000000</item>
+        <item>0x00000000</item>
+        <item>0x00000000</item>
+        <item>0x00000000</item>
+        <item>0x9fa8da</item>
+    </integer-array>
+
+</resources>
