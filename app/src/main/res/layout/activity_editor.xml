@@ -68,6 +68,14 @@
         android:layout_above="@id/bottom_gallery"
         android:layout_below="@id/banner" />
 
+    <com.davtyan.photoeditor.view.PaintDrawView
+        android:id="@+id/paint_dragView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_gallery"
+        android:layout_below="@id/banner"
+        android:visibility="gone"/>
+
 
 
     <LinearLayout

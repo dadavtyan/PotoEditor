@@ -1,12 +1,12 @@
 package com.davtyan.photoeditor.activitys;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Rect;
+import android.graphics.Canvas;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -21,6 +21,7 @@ import android.widget.ViewFlipper;
 import com.davtyan.photoeditor.BitmapManager;
 import com.davtyan.photoeditor.CustomViewPager;
 import com.davtyan.photoeditor.R;
+import com.davtyan.photoeditor.fragments.AddTextFragment;
 import com.davtyan.photoeditor.fragments.EditTextFragment;
 import com.davtyan.photoeditor.fragments.BeautyFragment;
 import com.davtyan.photoeditor.fragments.CropFragment;
@@ -32,24 +33,20 @@ import com.davtyan.photoeditor.fragments.StickerFragment;
 import com.davtyan.photoeditor.utils.BitmapUtil;
 import com.davtyan.photoeditor.utils.FileUtils;
 import com.davtyan.photoeditor.view.MySurfaceView;
+import com.davtyan.photoeditor.view.PaintDrawView;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 public class EditorActivity extends AppCompatActivity implements View.OnClickListener {
-    private static final String EXTRA_FROM_ALBUM = "extra_from_album";
-    private static final String EXTRA_CROPPED_FILE = "extra_cropped_file";
-
-    private static final int GALLERY_RESULT = 1;
     private static final int CAMERA_RESULT = 2;
     public static String EXTRA;
     public MySurfaceView mySurfaceView;
+    public PaintDrawView paintDrawView;
     private BitmapManager bitmapManager;
 
 
@@ -74,10 +71,8 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
     private String path;
 
 
-    public static Intent getJumpIntent(Context context, boolean fromAlbum, File croppedFile) {
+    public static Intent getJumpIntent(Context context) {
         Intent intent = new Intent(context, EditorActivity.class);
-//        intent.putExtra(EXTRA_FROM_ALBUM, fromAlbum);
-//        intent.putExtra(EXTRA_CROPPED_FILE, croppedFile);
         return intent;
     }
 
@@ -109,6 +104,8 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
         menuFragment = MainMenuFragment.newInstance();
         filterListFragment = FilterListFragment.newInstance();
         cropFragment = CropFragment.newInstance();
+        paintFragment = PaintFragment.newInstance();
+        stickerFragment = StickerFragment.newInstance();
 
     }
 
@@ -133,7 +130,6 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
         if (hasFocus && str != null) {
             mySurfaceView.setBitmap(bitmap);
             filterListFragment.setBitmap(bitmap);
-            cropFragment.setBitmap(bitmap);
             EXTRA = "select_image";
             str = null;
         }
@@ -141,26 +137,29 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
 
 
     private void initView() {
-
         bottomGallery = findViewById(R.id.bottom_gallery);
         mySurfaceView = findViewById(R.id.my_dragView);
+        paintDrawView = findViewById(R.id.paint_dragView);
         flipper = findViewById(R.id.flipper);
 
         findViewById(R.id.back_btn).setOnClickListener(this);
         findViewById(R.id.imgUndo).setOnClickListener(this);
         findViewById(R.id.imgRedo).setOnClickListener(this);
+        findViewById(R.id.apply).setOnClickListener(this);
+        findViewById(R.id.save_btn).setOnClickListener(this);
+
     }
 
     @Override
     public void onBackPressed() {
         switch (mode) {
             case MainMenuFragment.INDEX_STICKER:
-                bitmapManager.onBack(mySurfaceView, mySurfaceView.getCountList());
+                //bitmapManager.onBack(mySurfaceView, mySurfaceView.getCountList());
                 stickerFragment.backToMain();
                 break;
             case MainMenuFragment.INDEX_FILTER:
                 filterListFragment.backToMain();
-                mySurfaceView.setBitmap(filterListFragment.getBitmap());
+             //   mySurfaceView.setBitmap(filterListFragment.getBitmap());
                 return;
             case MainMenuFragment.INDEX_CROP:
                 cropFragment.backToMain();
@@ -169,7 +168,7 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
                 rotateFragment.backToMain();
                 return;
             case MainMenuFragment.INDEX_ADDTEXT:
-                bitmapManager.onBack(mySurfaceView, mySurfaceView.getCountList());
+               // bitmapManager.onBack(mySurfaceView, mySurfaceView.getCountList());
                 addTextFragment.backToMain();
                 return;
             case MainMenuFragment.INDEX_PAINT:
@@ -179,6 +178,7 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
                 beautyFragment.backToMain();
                 return;
         }
+
     }
 
 
@@ -226,10 +226,33 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
                 startActivity(new Intent(EditorActivity.this, LoadImageActivity.class));
                 break;
             case R.id.imgUndo:
-                bitmapManager.undo(mySurfaceView);
+                if (mode == MainMenuFragment.INDEX_MAIN){
+                    bitmapManager.undoMain(mySurfaceView);
+                    mySurfaceView.backCoordinate();
+                }else if (mode == MainMenuFragment.INDEX_PAINT){
+                    paintDrawView.undo();
+                }
+                else {
+                    bitmapManager.undo(mySurfaceView);
+
+                }
+
                 break;
             case R.id.imgRedo:
-                bitmapManager.redo(mySurfaceView);
+                if (mode == MainMenuFragment.INDEX_MAIN){
+                    bitmapManager.redoMain(mySurfaceView);
+                    mySurfaceView.backCoordinate();
+                }
+                else {
+                    bitmapManager.redo(mySurfaceView);
+                }
+
+                break;
+            case R.id.save_btn:
+                saveData();
+                break;
+            case R.id.apply:
+                applyBtnClick();
                 break;
         }
     }
@@ -251,7 +274,6 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
                     // flipper.showNext();
                     return stickerFragment;
                 case MainMenuFragment.INDEX_FILTER:
-                    bitmap = mySurfaceView.getBitmap();
                     // flipper.showNext();
                     return filterListFragment;
                 case MainMenuFragment.INDEX_CROP:
@@ -267,7 +289,6 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
                     // flipper.showNext();
                     return addTextFragment;
                 case MainMenuFragment.INDEX_PAINT:
-                    paintFragment = PaintFragment.newInstance();
                     // flipper.showNext();
                     return paintFragment;
                 case MainMenuFragment.INDEX_BEAUTY:
@@ -284,4 +305,55 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+
+    private void applyBtnClick() {
+        switch (mode) {
+            case MainMenuFragment.INDEX_STICKER:
+                stickerFragment.applyStickers();
+                break;
+            case MainMenuFragment.INDEX_FILTER:
+                filterListFragment.applyFilterImage();
+                break;
+            case MainMenuFragment.INDEX_CROP:
+                cropFragment.applyCropImage();
+                break;
+            case MainMenuFragment.INDEX_ROTATE:
+                rotateFragment.applyRotateImage();
+                break;
+            case MainMenuFragment.INDEX_ADDTEXT:
+                addTextFragment.applyTextImage();
+                break;
+            case MainMenuFragment.INDEX_PAINT:
+                paintFragment.savePaintImage();
+                break;
+            case MainMenuFragment.INDEX_BEAUTY:
+                beautyFragment.applyBeauty();
+                break;
+        }
+    }
+
+
+    private void saveData() {
+        File filename;
+        Bitmap bitmapMaster = mySurfaceView.getMainBitmaps().get(mySurfaceView.getMainBitmaps().size() - 1);
+        Canvas canvasMaster = new Canvas(bitmapMaster);
+        canvasMaster.drawBitmap(bitmapMaster, 0, 0, null);
+        try {
+            String path = Environment.getExternalStorageDirectory().toString();
+
+            new File(path + "/folder/subfolder").mkdirs();
+            filename = new File(path + "/folder/subfolder/image.jpg");
+
+            FileOutputStream out = new FileOutputStream(filename);
+            bitmapMaster.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            Log.i("bip3", String.valueOf(bitmapMaster.getConfig()));
+            out.flush();
+            out.close();
+
+            MediaStore.Images.Media.insertImage(getContentResolver(), filename.getAbsolutePath(), filename.getName(), filename.getName());
+            Toast.makeText(EditorActivity.this, "Image saved", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

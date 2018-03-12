@@ -17,15 +17,10 @@ import com.davtyan.photoeditor.activitys.EditorActivity;
 import com.davtyan.photoeditor.adapter.StickerAdapter;
 import com.davtyan.photoeditor.view.MySurfaceView;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class StickerFragment extends BaseEditFragment {
-    private View view;
-
     private RecyclerView recyclerIcon;
     private StickerAdapter iconAdapter;
+    private MySurfaceView mySurfaceView;
 
     private int[] images = {
             R.drawable.icon_1,
@@ -47,6 +42,7 @@ public class StickerFragment extends BaseEditFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_sticker, container, false);
+        mySurfaceView = getActivity().findViewById(R.id.my_dragView);
         LinearLayoutManager horizontalLayoutManage = new LinearLayoutManager(getActivity(),
                 LinearLayoutManager.HORIZONTAL, false);
         recyclerIcon = view.findViewById(R.id.stickers_type_list);
@@ -59,8 +55,8 @@ public class StickerFragment extends BaseEditFragment {
                     @Override
                     public void onItemClick(View v, int position) {
                         Bitmap bitmapItem = BitmapFactory.decodeResource(getActivity().getResources(), images[position]);
-                        ((MySurfaceView) getActivity().findViewById(R.id.my_dragView)).setBitmapSticker(bitmapItem);
-                        EditorActivity.EXTRA =  "draw_sticker";
+                        mySurfaceView.setBitmapSticker(bitmapItem);
+                        EditorActivity.EXTRA = "draw_sticker";
                     }
                 })
 
@@ -81,7 +77,12 @@ public class StickerFragment extends BaseEditFragment {
         activity.mode = 0;
         activity.bottomGallery.setCurrentItem(0);
         activity.flipper.showPrevious();
-//        mStickerView.setVisibility(View.GONE);
-//        activity.bannerFlipper.showPrevious();
+        EditorActivity.EXTRA = "select_image";
+    }
+
+    public void applyStickers() {
+        mySurfaceView.addBitmapSticker();
+        backToMain();
+
     }
 }

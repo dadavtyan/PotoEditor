@@ -23,7 +23,6 @@ public class PhotosActivity extends AppCompatActivity {
     private GridViewAdapter adapter;
     private RecyclerView recyclerViewImage;
     private RecyclerView.LayoutManager layoutManager;
-    private File photoFile;
     private TextView btnCamera;
 
 
@@ -33,7 +32,6 @@ public class PhotosActivity extends AppCompatActivity {
         setContentView(R.layout.activity_load_image);
         recyclerViewImage = findViewById(R.id.folder_list);
         btnCamera = findViewById(R.id.camera_btn);
-        photoFile = new File(getExternalFilesDir("img"), "scan.jpg");
 
         position = getIntent().getIntExtra("value", 5);
 
@@ -47,7 +45,7 @@ public class PhotosActivity extends AppCompatActivity {
         btnCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(EditorActivity.getJumpIntent(PhotosActivity.this, false, photoFile), 100);
+                startActivityForResult(EditorActivity.getJumpIntent(PhotosActivity.this), 100);
             }
         });
 

@@ -85,4 +85,8 @@ public class EditTextFragment extends BaseEditFragment implements View.OnClickLi
         }
     }
 
+    public void applyTextImage() {
+        activity.mySurfaceView.addBitmapSticker();
+        backToMain();
+    }
 }

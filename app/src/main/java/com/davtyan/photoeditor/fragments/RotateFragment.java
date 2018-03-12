@@ -19,9 +19,10 @@ import com.davtyan.photoeditor.view.MySurfaceView;
 public class RotateFragment extends BaseEditFragment implements SeekBar.OnSeekBarChangeListener {
 
 
-    private SeekBar seekBar;
+    private SeekBar rotationSeekBar;
     private ImageView imageRotate;
     private MySurfaceView mySurfaceView;
+
 
     public RotateFragment() {
         // Required empty public constructor
@@ -41,11 +42,12 @@ public class RotateFragment extends BaseEditFragment implements SeekBar.OnSeekBa
             @Override
             public void onClick(View v) {
                 mySurfaceView.setRotate(mySurfaceView.getRotate() + 90);
+
             }
         });
-        seekBar = view.findViewById(R.id.rotate_bar);
-        seekBar.setOnSeekBarChangeListener(this);
-        seekBar.setProgress(0);
+        rotationSeekBar = view.findViewById(R.id.rotate_bar);
+        rotationSeekBar.setOnSeekBarChangeListener(this);
+        rotationSeekBar.setProgress(0);
 
         return view;
     }
@@ -79,5 +81,9 @@ public class RotateFragment extends BaseEditFragment implements SeekBar.OnSeekBa
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
+    }
+
+    public void applyRotateImage() {
+        backToMain();
     }
 }

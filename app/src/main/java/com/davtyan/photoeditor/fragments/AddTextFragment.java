@@ -40,6 +40,8 @@ public class AddTextFragment extends DialogFragment implements View.OnClickListe
     private String text;
     private int textColor;
     private List<Integer> colorPickerColors;
+    private MySurfaceView mySurfaceView;
+    private Bitmap bitmap;
 
     public AddTextFragment() {
         // Required empty public constructor
@@ -79,7 +81,7 @@ public class AddTextFragment extends DialogFragment implements View.OnClickListe
         final ColorPickerAdapter colorPickerAdapter = new ColorPickerAdapter(getActivity(), colorPickerColors);
         addTextColors.setAdapter(colorPickerAdapter);
 
-
+        mySurfaceView = (getActivity().findViewById(R.id.my_dragView));
         editText = view.findViewById(R.id.edit_text);
         addText = view.findViewById(R.id.add_text);
         addText.setOnClickListener(this);
@@ -104,8 +106,8 @@ public class AddTextFragment extends DialogFragment implements View.OnClickListe
         mInputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
         dismiss();
         if (text != null && text.length() != 0) {
-            ((MySurfaceView) getActivity().findViewById(R.id.my_dragView))
-                    .setBitmapSticker(BitmapUtil.createTextBitmap(text, textColor));
+            bitmap = BitmapUtil.createTextBitmap(text, textColor);
+            mySurfaceView.setBitmapSticker(bitmap);
             EditorActivity.EXTRA = "draw_sticker";
 
         }

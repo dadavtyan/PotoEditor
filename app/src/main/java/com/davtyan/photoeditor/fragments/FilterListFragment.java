@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import com.davtyan.photoeditor.FilterModel;
 import com.davtyan.photoeditor.R;
 import com.davtyan.photoeditor.RecyclerItemClickListener;
+import com.davtyan.photoeditor.activitys.EditorActivity;
 import com.davtyan.photoeditor.adapter.FilterAdapter;
 import com.davtyan.photoeditor.utils.BitmapUtil;
 import com.davtyan.photoeditor.view.MySurfaceView;
@@ -28,11 +29,12 @@ public class FilterListFragment extends BaseEditFragment {
     private RecyclerView recyclerView;
     private FilterAdapter filterAdapter;
     private List<FilterModel> filterModels;
+    private MySurfaceView mySurfaceView;
     private FilterModel model;
 
     private @ColorInt int[] mul ;
     private @ColorInt int[] add ;
-    private Bitmap bitmap,bitmapFilter,bitmapFilterItem;
+    private Bitmap bitmap,bitmapFilterItem;
     private String [] name = {"b_0","b_1", "b_2", "b_3", "b_4", "b_5", "b_6", "b_7", "b_8", "b_9", "b_10", "b_11", "b_12"};
 
     public FilterListFragment() {
@@ -51,10 +53,12 @@ public class FilterListFragment extends BaseEditFragment {
 
         recyclerView = view.findViewById(R.id.filter_list);
         recyclerView.setLayoutManager(horizontalLayoutManage);
+        mySurfaceView = (getActivity().findViewById(R.id.my_dragView));
 
         if (isAdded()){
             Resources res = getResources();
-            mul = res.getIntArray(R.array.mul_filters);
+            //mul = res.getIntArray(R.array.mul_filters);
+            mul = res.getIntArray(R.array.color_filters);
             add = res.getIntArray(R.array.add_filters);
             filterAdapter = new FilterAdapter(activity, getBitmapList(bitmap));
             recyclerView.setAdapter(filterAdapter);
@@ -65,25 +69,22 @@ public class FilterListFragment extends BaseEditFragment {
                     @Override
                     public void onItemClick(View v, int position) {
                       if (position == 0){
-                          ((MySurfaceView)getActivity().findViewById(R.id.my_dragView)).setBitmap(bitmap);
+                          mySurfaceView.setFilter(bitmap);
                       }
                       else if (position == filterModels.size() - 1){
 
 //                          LoadImageTask task = new LoadImageTask();
 //                          task.execute(bitmap);
 
-                          ((MySurfaceView)getActivity().findViewById(R.id.my_dragView)).
-                                  setBitmapResult(BitmapUtil.fffff(bitmap));
+                          mySurfaceView.setFilter(BitmapUtil.blendingBitmap(bitmap,BitmapUtil.fffff(bitmap)));
+
                       }
                       else {
-                          bitmapFilter = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-                          ((MySurfaceView)getActivity().findViewById(R.id.my_dragView)).
-                                  setBitmapResult(BitmapUtil.getBitmapFilter(bitmapFilter, mul[position],add[position]));
-                          bitmapFilter = null;
+                          mySurfaceView.setFilter(BitmapUtil.createShadowBitmap(bitmap,null, mul[position]));
                       }
+                        EditorActivity.EXTRA = "draw_filter";
                     }
                 })
-
         );
         return view;
     }
@@ -103,7 +104,7 @@ public class FilterListFragment extends BaseEditFragment {
         for (int i = 0; i < 13; i++) {
             bitmapFilterItem = Bitmap.createScaledBitmap(bitmap, 120, 240, true);
             if (i == 0) model = new FilterModel(bitmapFilterItem, name[i]);
-            else model = new FilterModel(BitmapUtil.getBitmapFilter(bitmapFilterItem,mul[i],add[i]), name[i]);
+            else model = new FilterModel(BitmapUtil.createShadowBitmap(bitmapFilterItem,null,mul[i]), name[i]);
             filterModels.add(model);
             bitmapFilterItem = null;
         }
@@ -119,6 +120,7 @@ public class FilterListFragment extends BaseEditFragment {
     @Override
     public void backToMain() {
         activity.mode = 0;
+        EditorActivity.EXTRA  = "select_image";
         activity.bottomGallery.setCurrentItem(0);
         activity.flipper.showPrevious();
     }
@@ -128,8 +130,11 @@ public class FilterListFragment extends BaseEditFragment {
     }
 
 
-    public Bitmap getBitmapFilter() {
-        return bitmapFilter;
+
+
+    public void applyFilterImage() {
+        mySurfaceView.addBitmapFilter();
+        backToMain();
     }
 
 

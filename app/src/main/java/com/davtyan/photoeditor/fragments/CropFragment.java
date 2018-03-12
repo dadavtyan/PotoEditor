@@ -64,6 +64,7 @@ public class CropFragment extends BaseEditFragment implements View.OnClickListen
         activity.mode = 0;
         activity.bottomGallery.setCurrentItem(0);
         activity.flipper.showPrevious();
+        EditorActivity.EXTRA = "select_image";
     }
 
     public void setBitmap(Bitmap bitmap) {
@@ -84,8 +85,7 @@ public class CropFragment extends BaseEditFragment implements View.OnClickListen
                 EditorActivity.EXTRA = "draw_crop";
                 break;
             case R.id.crop_3:
-                mySurfaceView.setBitmap(cropBitmap());
-                backToMain();
+
                 break;
             case R.id.crop_4:
                 break;
@@ -95,20 +95,21 @@ public class CropFragment extends BaseEditFragment implements View.OnClickListen
     }
 
     private Bitmap cropBitmap() {
-        float targetWidth = (mySurfaceView.getRectWidth() - mySurfaceView.getRectX());
+        float targetWidth = (mySurfaceView.getRectWidth() - mySurfaceView.getRectX()  );
         float targetHeight = (mySurfaceView.getRectHeight() - mySurfaceView.getRectY());
+        //float width = targetWidth
 
-        Bitmap targetBitmap = Bitmap.createBitmap(bitmapCrop.getWidth(), bitmapCrop.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap targetBitmap = Bitmap.createBitmap((int) targetWidth, (int) targetHeight, Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(targetBitmap);
         canvas.drawBitmap(bitmapCrop,
                 new Rect(
                         (int) (mySurfaceView.getRectX()),
                         (int) (mySurfaceView.getRectY()),
-                        (int) (mySurfaceView.getRectWidth()),
+                        (int) (mySurfaceView.getRectWidth()  ),
                         (int) (mySurfaceView.getRectHeight())),
-                new RectF(0, 0, bitmapCrop.getWidth(), bitmapCrop.getHeight()), null);
-        //  bitmapCrop = targetBitmap.copy(Bitmap.Config.ARGB_8888, true);
+                new RectF(0, 0, targetWidth, targetHeight), null);
+        bitmapCrop = targetBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
         return targetBitmap;
     }
@@ -136,6 +137,11 @@ public class CropFragment extends BaseEditFragment implements View.OnClickListen
         resizedPath.transform(resizeMatrix);
 
         return resizedPath;
+    }
+
+    public void applyCropImage() {
+        mySurfaceView.setBitmap(cropBitmap());
+        backToMain();
     }
 }
 

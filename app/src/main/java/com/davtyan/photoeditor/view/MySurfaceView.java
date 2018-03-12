@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -24,25 +25,22 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private List<String> texts;
     private Paint paint;
     private DrawThread drawThread;
-    private float x, y, width, height, rotate;
-    private int countBitmap;
+    private float rotate;
 
     private List<Position> positionList;
-    private int countList = 0;
     private Position position;
     private int posSelected;
     private boolean selected;
     private int viewX, viewY;
 
-    private float rotateX, rotateY;
-    private Bitmap bitmap, bitmapResult;
+    private Bitmap bitmap;
     private int bitmapWidth, bitmapHeight;
     private float moveX = 0;
     private float moveY = 0;
     private RectF rectF;
     private Bitmap sticker;
-    private List<Bitmap> bitmaps;
-    private List<Boolean> booleans = new ArrayList<>();
+    private List<Bitmap> currentBitmaps;
+    private List<Bitmap> mainBitmaps;
 
 
     private Select select = Select.DEFAULT;
@@ -61,46 +59,51 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void initData() {
-        bitmaps = new ArrayList<>();
+        currentBitmaps = new ArrayList<>();
+        mainBitmaps = new ArrayList<>();
         texts = new ArrayList<>();
         positionList = new ArrayList<>();
         getHolder().addCallback(this);
         paint = new Paint();
         rectF = new RectF();
-        width = getWidth() / 2;
-        height = getHeight() / 2;
     }
 
 
     public void setBitmap(Bitmap bitmap) {
+        setBitmapData(bitmap);
+    }
+
+    public void setFilter(Bitmap bitmap) {
         this.bitmap = bitmap;
+    }
+
+    private void setBitmapData(Bitmap bitmap) {
         if (bitmap.getWidth() > bitmap.getHeight()) {
             bitmapWidth = getWidth() - 50;
-            bitmapHeight = getBitmapHeight(bitmap);
-            Log.i("bitmap1", "bitmapWidth: " + bitmapWidth + " bitmapHeight: " + bitmapHeight);
+            bitmapHeight = getBitmapSize(bitmap.getHeight(), bitmapWidth, bitmap.getWidth());
             bitmapX = 25;
             bitmapY = (this.getHeight() - bitmapHeight) / 2;
         } else if (bitmap.getHeight() > bitmap.getWidth()) {
             bitmapHeight = getHeight() - 50;
-            bitmapWidth = getBitmapWidth(bitmap);
-            Log.i("bitmap2", "bitmapWidth: " + bitmapWidth + " bitmapHeight: " + bitmapHeight);
+            bitmapWidth = getBitmapSize(bitmap.getWidth(), bitmapHeight, bitmap.getHeight());
             bitmapX = (getWidth() - bitmapWidth) / 2;
             bitmapY = 25;
-        } else if(bitmap.getHeight() == bitmap.getWidth()){
+        } else if (bitmap.getHeight() == bitmap.getWidth()) {
             bitmapWidth = getWidth() - 10;
             bitmapHeight = bitmapWidth;
-            Log.i("bitmap", "bitmapWidth: " + bitmapWidth + " bitmapHeight: " + bitmapHeight);
             bitmapX = (getWidth() - bitmapWidth) / 2;
             bitmapY = (getHeight() - bitmapHeight) / 2;
         }
+        this.bitmap = Bitmap.createScaledBitmap(bitmap, bitmapWidth, bitmapHeight, true);
+        mainBitmaps.add(this.bitmap);
+        setRectData();
+    }
 
-
-
-
+    private void setRectData() {
         rectX = bitmapX;
-        rectY = bitmapHeight/8 + bitmapY;
+        rectY = bitmapHeight / 8 + bitmapY;
         rectWidth = rectX + bitmapWidth;
-        rectHeight = 7*bitmapHeight/8 + bitmapY;
+        rectHeight = 7 * bitmapHeight / 8 + bitmapY;
 
 //        rectX = bitmapWidth/8 + bitmapX;
 //        rectY =  bitmapY;
@@ -111,72 +114,64 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 //        rectY = bitmapHeight / 8 + bitmapY;
 //        rectWidth = 7 * bitmapWidth / 8 + bitmapX;
 //        rectHeight = 7 * bitmapHeight / 8 + bitmapY;
-
     }
 
-    private int getBitmapHeight(Bitmap bitmap) {
-        return (int) Math.floor((double) bitmap.getHeight() *( (double) bitmapWidth / (double) bitmap.getWidth()));
+    private int getBitmapSize(int size1, int size2, int size3) {
+        return (size1 * size2) / size3;
     }
 
-    private int getBitmapWidth(Bitmap bitmap) {
 
-        return (int) Math.floor((double) bitmap.getWidth() *((double) bitmapHeight / (double) bitmap.getHeight()));
-    }
-
-    public void setBitmapResult(Bitmap bitmap) {
-        if (bitmap != null) {
-            this.bitmap = bitmap;
-
+    public void addBitmapSticker() {
+        Bitmap newBitmap = Bitmap.createScaledBitmap(mainBitmaps.get(mainBitmaps.size() - 1), bitmapWidth, bitmapHeight, true);
+        Canvas canvas = new Canvas(newBitmap);
+        for (int i = 0; i < currentBitmaps.size(); i++) {
+            canvas.drawBitmap(currentBitmaps.get(i), positionList.get(i).getDX() - bitmapX,
+                    positionList.get(i).getDY() - bitmapY, null);
         }
-
+        mainBitmaps.add(newBitmap);
+        currentBitmaps.clear();
+        positionList.clear();
     }
 
-    public float getRectX() {
-        return rectX;
+    public void addBitmapFilter() {
+        Bitmap newBitmap = Bitmap.createScaledBitmap(bitmap, bitmapWidth, bitmapHeight, true);
+        mainBitmaps.add(newBitmap);
     }
-
-    public float getRectY() {
-        return rectY;
-    }
-
-    public float getRectWidth() {
-        return rectWidth;
-    }
-
-    public float getRectHeight() {
-        return rectHeight;
-    }
-
 
     public void setBitmapSticker(Bitmap bitmap) {
         viewX = 400;
         viewY = 500;
         if (bitmap != null) {
             sticker = bitmap;
-            bitmaps.add(sticker);
+            currentBitmaps.add(sticker);
             position = new Position(viewX, viewY);
-            countList++;
             positionList.add(position);
-            booleans.add(true);
-
         }
+    }
+
+    public void backCoordinate() {
+        bitmapWidth = mainBitmaps.get(mainBitmaps.size() - 1).getWidth();
+        bitmapHeight = mainBitmaps.get(mainBitmaps.size() - 1).getHeight();
+        bitmapX = (getWidth() - bitmapWidth) / 2;
+        bitmapY = (getHeight() - bitmapHeight) / 2;
 
     }
 
-    public int getCountList() {
-        return countList;
+    public List<Bitmap> getMainBitmaps() {
+        return mainBitmaps;
     }
 
-    public void setCountList(int countList) {
-        this.countList = countList;
+    public void setMainBitmaps(List<Bitmap> mainBitmaps) {
+        this.mainBitmaps = mainBitmaps;
     }
+
 
     public List<Bitmap> getBitmaps() {
-        return bitmaps;
+        return currentBitmaps;
     }
 
     public void setBitmaps(List<Bitmap> bitmaps) {
-        this.bitmaps = bitmaps;
+        this.currentBitmaps = bitmaps;
     }
 
     public void setText(String text) {
@@ -189,7 +184,6 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     public void setRotate(int rotate) {
         this.rotate = rotate;
-        booleans.add(false);
     }
 
 
@@ -197,8 +191,20 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         return (int) rotate;
     }
 
-    public List<Boolean> getBooleans() {
-        return booleans;
+    public float getRectX() {
+        return rectX - bitmapX;
+    }
+
+    public float getRectY() {
+        return rectY - bitmapY;
+    }
+
+    public float getRectWidth() {
+        return rectWidth - bitmapX;
+    }
+
+    public float getRectHeight() {
+        return rectHeight - bitmapY;
     }
 
 
@@ -206,8 +212,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                for (int i = 0; i < bitmaps.size(); i++) {
-                    Bitmap bitmap = bitmaps.get(i);
+                for (int i = 0; i < currentBitmaps.size(); i++) {
+                    Bitmap bitmap = currentBitmaps.get(i);
                     if (event.getX() > positionList.get(i).getDX() && event.getX() < positionList.get(i).getDX() + bitmap.getWidth()
                             && event.getY() > positionList.get(i).getDY() && event.getY() < positionList.get(i).getDY() + bitmap.getHeight()) {
                         posSelected = i;
@@ -222,7 +228,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                 moveX = event.getX();
                 moveY = event.getY();
 
-              //  selectEdge(event);
+                //  selectEdge(event);
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (EditorActivity.EXTRA == "draw_crop") {
@@ -289,41 +295,41 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
                     }
 
-                }
-
-               else if (selected) {
+                } else if (selected && EditorActivity.EXTRA == "draw_sticker") {
                     viewX -= moveX - event.getX();
                     viewY -= moveY - event.getY();
                     moveX = event.getX();
                     moveY = event.getY();
                     positionList.get(posSelected).setDX(viewX);
                     positionList.get(posSelected).setDY(viewY);
+                } else if (EditorActivity.EXTRA == "draw_path") {
+                    /**
+                     *
+                     */
                 }
-
                 break;
             case MotionEvent.ACTION_UP:
-//                if (rectX < 0){
-//                    rectWidth -= rectX;
-//                    rectX = bitmapX;
-//                }
-//                if (rectY < 0){
-//                    rectHeight -= rectY;
-//                    rectY = bitmapY;
-//                }
-//                if (rectWidth > bitmapWidth){
-//                    rectX -= rectWidth - bitmapWidth;
-//                    rectWidth = bitmapWidth;
-//                }
-//                if (rectHeight > bitmapHeight){
-//                    rectY -= rectHeight - bitmapHeight;
-//                    rectHeight = bitmapHeight;
-//                }
+                if (rectX < bitmapX) {
+                    rectWidth += (bitmapX - rectX);
+                    rectX = bitmapX;
+                }
+                if (rectY < bitmapY) {
+                    rectHeight += (bitmapY - rectY);
+                    rectY = bitmapY;
+                }
+                if (rectWidth > (bitmapWidth + bitmapX)) {
+                    rectX -= rectWidth - (bitmapWidth + bitmapX);
+                    rectWidth = bitmapWidth + bitmapX;
+                }
+                if (rectHeight > (bitmapHeight + bitmapY)) {
+                    rectY -= rectHeight - (bitmapHeight + bitmapY);
+                    rectHeight = bitmapHeight + bitmapY;
+                }
                 moveX = 0;
                 moveY = 0;
-                Log.i("mySurfaceView", "X1: " + rectX + " Y1: " + rectY +
-                        " W1: " + (rectWidth) + " H1: " + (rectHeight));
                 break;
         }
+        invalidate();
         return true;
     }
 
@@ -342,11 +348,6 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         } else {
             select = Select.DEFAULT;
         }
-    }
-
-    private int getImageX(MotionEvent event) {
-        int length = (int) (Math.pow((event.getX() - moveX), 2) - Math.pow((event.getY() - moveY), 2));
-        return (int) Math.sqrt(length);
     }
 
 
@@ -375,14 +376,6 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
-    public float getX() {
-        return x;
-    }
-
-    public float getY() {
-        return y;
-    }
-
 
     public class DrawThread extends Thread {
 
@@ -401,7 +394,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         @Override
         public void run() {
             Canvas canvas = null;
-            while (running) {
+            while (running ) {
                 try {
                     canvas = surfaceHolder.lockCanvas(null);
                     if (canvas == null)
@@ -423,50 +416,41 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             paint.setColor(Color.RED);
             paint.setStrokeWidth(10);
 
-            rotateX = x + (width - x) / 2;
-            rotateY = y + (height - y) / 2;
-
             switch (EditorActivity.EXTRA) {
-                case "draw_point":
-                    canvas.rotate(rotate, x, y + 5);
-                    canvas.drawPoint(x, y, paint);
-                    break;
-
                 case "draw_sticker":
                     canvas.rotate(rotate, getWidth() / 2, getHeight() / 2);
                     drawImage(canvas, bitmapX, bitmapY);
                     drawSticker(canvas);
                     break;
-                case "draw_line":
-                    canvas.rotate(rotate, rotateX, rotateY);
-                    canvas.drawLine(x, y, width, height, paint);
-                    break;
-                case "draw_circle":
-                    canvas.rotate(rotate, x, y);
-                    canvas.drawCircle(x, y, 100, paint);
-                    canvas.drawLine(x, y, x + 150, height, paint);
-                    break;
-                case "draw_rect":
-                    canvas.rotate(rotate, rotateX, rotateY);
-                    canvas.drawRect(x, y, width, height, paint);
-                    break;
                 case "draw_crop":
                     drawImage(canvas, bitmapX, bitmapY);
                     drawRect(canvas);
                     break;
+                case "draw_rotate":
+                    canvas.rotate(rotate, getWidth() / 2, getHeight() / 2);
+                    drawImage(canvas, bitmapX, bitmapY);
+                    break;
                 case "select_image":
                     drawImage(canvas, bitmapX, bitmapY);
+                    break;
+                case "draw_filter":
+                    drawFilter(canvas, bitmapX, bitmapY);
                     break;
             }
 
 
         }
 
+        private void drawFilter(Canvas canvas, int bitmapX, int bitmapY) {
+            canvas.drawBitmap(bitmap, bitmapX, bitmapY, null);
+        }
+
+
         private void drawText(Canvas canvas) {
             paint.setTextSize(150);
             //canvas.rotate(rotate, x + 200 + TEXT.length() * 25, bitmapHeight/2 + 75);
             for (int i = 0; i < texts.size(); i++) {
-                canvas.drawText(texts.get(i), x + 200, y + 300, paint);
+                canvas.drawText(texts.get(i), bitmapWidth / 2, bitmapHeight / 2, paint);
             }
         }
 
@@ -486,14 +470,15 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
         }
 
-        private void drawImage(Canvas canvas, float cX, float cY) {
-            bitmapResult = Bitmap.createScaledBitmap(bitmap, bitmapWidth, bitmapHeight, true);
-            canvas.drawBitmap(bitmapResult, cX, cY, null);
+        public Bitmap drawImage(Canvas canvas, float cX, float cY) {
+            // bitmapResult = Bitmap.createScaledBitmap(mainBitmaps.get(mainBitmaps.size() - 1), bitmapWidth, bitmapHeight, true);
+            canvas.drawBitmap(mainBitmaps.get(mainBitmaps.size() - 1), cX, cY, null);
+            return mainBitmaps.get(mainBitmaps.size() - 1);
         }
 
         private void drawSticker(Canvas canvas) {
-            for (int i = 0; i < bitmaps.size(); i++) {
-                canvas.drawBitmap(bitmaps.get(i), positionList.get(i).getDX(), positionList.get(i).getDY(), null);
+            for (int i = 0; i < currentBitmaps.size(); i++) {
+                canvas.drawBitmap(currentBitmaps.get(i), positionList.get(i).getDX(), positionList.get(i).getDY(), null);
             }
         }
     }

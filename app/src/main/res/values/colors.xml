@@ -16,4 +16,22 @@
     <color name="violet_color_picker">#8359A3</color>
     <color name="yellow_color_picker">#FBE870</color>
     <color name="yellow_green_color_picker">#C5E17A</color>
+
+
+    <array name="color_filters">
+        <item>@color/colorPrimaryDark</item>
+        <item>@color/colorPrimaryDark</item>
+        <item>@color/colorAccent</item>
+        <item>@color/blue_color_picker</item>
+        <item>@color/black</item>
+        <item>@color/brown_color_picker</item>
+        <item>@color/green_color_picker</item>
+        <item>@color/orange_color_picker</item>
+        <item>@color/red_color_picker</item>
+        <item>@color/sky_blue_color_picker</item>
+        <item>@color/violet_color_picker</item>
+        <item>@color/yellow_color_picker</item>
+        <item>@color/yellow_green_color_picker</item>
+
+    </array>
 </resources>

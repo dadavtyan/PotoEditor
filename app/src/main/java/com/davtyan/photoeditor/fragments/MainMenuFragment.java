@@ -1,6 +1,7 @@
 package com.davtyan.photoeditor.fragments;
 
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.davtyan.photoeditor.R;
 import com.davtyan.photoeditor.activitys.EditorActivity;
+import com.davtyan.photoeditor.view.MySurfaceView;
 
 
 /**
@@ -25,6 +27,9 @@ public class MainMenuFragment extends BaseEditFragment implements View.OnClickLi
     public static final int INDEX_PAINT = 6;
     public static final int INDEX_BEAUTY = 7;
 
+    private Bitmap bitmap;
+    private MySurfaceView mySurfaceView;
+
 
     public MainMenuFragment() {
         // Required empty public constructor
@@ -40,6 +45,7 @@ public class MainMenuFragment extends BaseEditFragment implements View.OnClickLi
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_main_menu, container, false);
+        mySurfaceView = (getActivity().findViewById(R.id.my_dragView));
         initView(view);
         return view;
     }
@@ -67,6 +73,7 @@ public class MainMenuFragment extends BaseEditFragment implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
+        bitmap = activity.mySurfaceView.getMainBitmaps().get(activity.mySurfaceView.getMainBitmaps().size() - 1);
         switch (v.getId()) {
             case R.id.image_filter:
                 onShowFilterFragment();
@@ -97,6 +104,7 @@ public class MainMenuFragment extends BaseEditFragment implements View.OnClickLi
 
 
     private void onShowFilterFragment() {
+        activity.filterListFragment.setBitmap(bitmap);
         activity.bottomGallery.setCurrentItem(INDEX_FILTER);
        // activity.filterListFragment.onShow();
         activity.mode = INDEX_FILTER;
@@ -120,6 +128,11 @@ public class MainMenuFragment extends BaseEditFragment implements View.OnClickLi
 
     }
     private void onShowPaintFragment() {
+       // mySurfaceView.setVisibility(View.GONE);
+        activity.paintDrawView.setVisibility(View.VISIBLE);
+        activity.paintDrawView.setBitmap(bitmap,mySurfaceView.getWidth(),mySurfaceView.getHeight());
+        activity.paintFragment.setBitmap(bitmap);
+
         activity.bottomGallery.setCurrentItem(INDEX_PAINT);
         //activity.paintFragment.onShow();
         activity.mode = INDEX_PAINT;
@@ -134,6 +147,8 @@ public class MainMenuFragment extends BaseEditFragment implements View.OnClickLi
     }
 
     private void onShowCropFragment() {
+        activity.cropFragment.setBitmap(activity.mySurfaceView.getMainBitmaps()
+                .get(activity.mySurfaceView.getMainBitmaps().size() - 1));
         activity.bottomGallery.setCurrentItem(INDEX_CROP);
         //activity.cropFragment.onShow();
         activity.mode = INDEX_CROP;
